@@ -33,7 +33,7 @@ const Content = ({ course }: { course: Course }) => {
     )
 }
 
-const Part = ({ part }: { part: Part }) => {
+const Part = ({ part }: { part: PartType }) => {
     return (
         <p key={part.title}>
             {part.title} {part.exercises}
@@ -50,10 +50,10 @@ const Total = ({ course }: { course: Course }) => {
 }
 interface Course {
     name: string
-    parts: Part[]
+    parts: PartType[]
 }
 
-interface Part {
+interface PartType {
     title: string
     exercises: number
 }
