@@ -1,26 +1,61 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from 'react'
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const course: Course = {
+        name: 'Half Stack application development',
+        parts: [
+            { title: 'Fundamentals of React', exercises: 10 },
+            { title: 'Using props to pass data', exercises: 7 },
+            { title: 'State of a component', exercises: 14 },
+        ],
+    }
+
+    return (
+        <div>
+            <Header course={course} />
+            <Content course={course} />
+            <Total course={course} />
+        </div>
+    )
 }
 
-export default App;
+const Header = ({ course }: { course: Course }) => {
+    return <h1>{course.name}</h1>
+}
+
+const Content = ({ course }: { course: Course }) => {
+    return (
+        <div>
+            {course.parts.map((part) => (
+                <Part part={part} />
+            ))}
+        </div>
+    )
+}
+
+const Part = ({ part }: { part: Part }) => {
+    return (
+        <p key={part.title}>
+            {part.title} {part.exercises}
+        </p>
+    )
+}
+const Total = ({ course }: { course: Course }) => {
+    return (
+        <p>
+            Number of exercises{' '}
+            {course.parts.reduce((sum, current) => sum + current.exercises, 0)}
+        </p>
+    )
+}
+interface Course {
+    name: string
+    parts: Part[]
+}
+
+interface Part {
+    title: string
+    exercises: number
+}
+
+export default App
