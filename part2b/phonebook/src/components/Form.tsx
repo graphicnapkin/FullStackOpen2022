@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { ContactType } from '../types'
 
 const Form = ({ persons, setPersons }: FormProps) => {
-    const [nextId, setNextId] = useState(1)
+    const [nextId, setNextId] = useState(5)
     const [newContact, setNewContact] = useState<ContactType>({
         name: '',
         number: '',
@@ -24,35 +24,38 @@ const Form = ({ persons, setPersons }: FormProps) => {
     }
 
     return (
-        <form onSubmit={handleSubmit}>
-            <div>
-                name:{' '}
-                <input
-                    onChange={(e) =>
-                        setNewContact({
-                            ...newContact,
-                            name: e.target.value,
-                        })
-                    }
-                    value={newContact.name}
-                />
-                <br />
-                number:{' '}
-                <input
-                    onChange={(e) =>
-                        setNewContact({
-                            ...newContact,
-                            number: e.target.value,
-                        })
-                    }
-                    value={newContact.number}
-                />
-            </div>
-            <div>
-                <button type="submit">add</button>
-            </div>
-            <div>debug: {newContact.name}</div>
-        </form>
+        <div>
+            <h1>add a new</h1>
+            <form onSubmit={handleSubmit}>
+                <div>
+                    name:{' '}
+                    <input
+                        onChange={(e) =>
+                            setNewContact({
+                                ...newContact,
+                                name: e.target.value,
+                            })
+                        }
+                        value={newContact.name}
+                    />
+                    <br />
+                    number:{' '}
+                    <input
+                        onChange={(e) =>
+                            setNewContact({
+                                ...newContact,
+                                number: e.target.value,
+                            })
+                        }
+                        value={newContact.number}
+                    />
+                </div>
+                <div>
+                    <button type="submit">add</button>
+                </div>
+                <div>debug: {newContact.name}</div>
+            </form>
+        </div>
     )
 }
 
