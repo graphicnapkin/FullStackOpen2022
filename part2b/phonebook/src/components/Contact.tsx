@@ -6,7 +6,7 @@ const Contact = ({ person, persons, setPersons }: ContactProps) => {
   const handleDelete = () => {
     const confirm = window.confirm(`Delete ${person.name}?`);
     if (confirm) deleteContact(person.id);
-    setPersons(persons.filter(contact => contact.id !== person.id));
+    setPersons(persons.filter((contact) => contact.id !== person.id));
   };
 
   return (
@@ -20,7 +20,7 @@ const Contact = ({ person, persons, setPersons }: ContactProps) => {
 interface ContactProps {
   person: ContactType;
   persons: ContactType[];
-  setPersons: React.Dispatch<React.SetStateAction<ContactType[]>>;
+  setPersons: (persons: ContactType[]) => void;
 }
 
 export default Contact;

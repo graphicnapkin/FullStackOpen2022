@@ -20,7 +20,7 @@ const Numbers = ({ persons, setPersons, filter}: NumbersProps) => {
 
 interface NumbersProps {
     persons: ContactType[]
-    setPersons: React.Dispatch<React.SetStateAction<ContactType[]>>
+    setPersons: (persons: ContactType[]) => void
     filter: string
 }
 

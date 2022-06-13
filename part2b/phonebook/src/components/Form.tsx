@@ -19,13 +19,15 @@ const Form = ({ persons, setPersons }: FormProps) => {
         setPersons(
           persons.map((person) =>
             person.name !== updatedRecord.name ? person : updatedRecord
-          )
+          ),
+          updatedRecord,
+          "updated"
         );
       }
       return;
     }
     const response = makeContact(newContact);
-    response.then((data) => setPersons([...persons, data]));
+    response.then((data) => setPersons([...persons, data], data, "added"));
   };
 
   return (
@@ -66,6 +68,10 @@ const Form = ({ persons, setPersons }: FormProps) => {
 
 interface FormProps {
   persons: ContactType[];
-  setPersons: React.Dispatch<React.SetStateAction<ContactType[]>>;
+  setPersons: (
+    persons: ContactType[],
+    person?: ContactType,
+    kind?: string
+  ) => void;
 }
 export default Form;
