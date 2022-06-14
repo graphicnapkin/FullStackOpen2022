@@ -60,7 +60,6 @@ const Form = ({ persons, setPersons }: FormProps) => {
         <div>
           <button type="submit">add</button>
         </div>
-        <div>debug: {newContact.name}</div>
       </form>
     </div>
   );
@@ -70,8 +69,8 @@ interface FormProps {
   persons: ContactType[];
   setPersons: (
     persons: ContactType[],
-    person?: ContactType,
-    kind?: string
+    person: ContactType,
+    kind: string
   ) => void;
 }
 export default Form;

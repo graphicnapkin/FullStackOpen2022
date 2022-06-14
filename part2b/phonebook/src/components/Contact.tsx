@@ -5,8 +5,12 @@ import { deleteContact, getContacts } from "./api";
 const Contact = ({ person, persons, setPersons }: ContactProps) => {
   const handleDelete = () => {
     const confirm = window.confirm(`Delete ${person.name}?`);
-    if (confirm) deleteContact(person.id);
-    setPersons(persons.filter((contact) => contact.id !== person.id));
+    try {
+      if (confirm) deleteContact(person.id);
+    } catch(err) {
+    setPersons(persons.filter((contact) => contact.id !== person.id),person,"notfound");
+    }
+    setPersons(persons.filter((contact) => contact.id !== person.id),person,"deleted");
   };
 
   return (
@@ -20,7 +24,7 @@ const Contact = ({ person, persons, setPersons }: ContactProps) => {
 interface ContactProps {
   person: ContactType;
   persons: ContactType[];
-  setPersons: (persons: ContactType[]) => void;
+  setPersons: (persons: ContactType[], person: ContactType, kind: string) => void;
 }
 
 export default Contact;

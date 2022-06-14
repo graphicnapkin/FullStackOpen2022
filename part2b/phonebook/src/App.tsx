@@ -12,17 +12,17 @@ const App = () => {
     { name: "", number: "", id: NaN },
   ]);
   const [filter, setFilter] = useState("");
-  const [notification, setNotificaiton] = useState({ msg: "", kind: "" });
+  const [notification, setNotification] = useState({ msg: "", kind: "" });
 
-  const handleSetPersons =(persons: ContactType[], person?: ContactType, kind?: string) => {
-    setPersons(persons)
-    if(person && kind) {
-      setNotificaiton({msg: `${person.name} was ${kind}`, kind})
-      console.log(notification)
-    }
-    setTimeout(()=> setNotificaiton({ msg: "", kind: "" }), 5000)
+  const handleSetPersons = (
+    persons: ContactType[],
+    person: ContactType,
+    kind: string
+  ) => {
+    setPersons(persons);
+    person && kind && displayNotification(person, kind, setNotification)
   }
-
+  
   useEffect(() => {
     const currentContacts = getContacts().then((contacts) =>
       setPersons(contacts)
@@ -32,12 +32,33 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notificaiton msg={notification.msg} type={notification.kind} />
+      <Notificaiton msg={notification.msg} kind={notification.kind} />
       <Filter filter={filter} setFilter={setFilter} />
       <PersonForm persons={persons} setPersons={handleSetPersons} />
-      <Contacts persons={persons} setPersons={handleSetPersons} filter={filter} />
+      <Contacts
+        persons={persons}
+        setPersons={handleSetPersons}
+        filter={filter}
+      />
     </div>
   );
 };
+
+const displayNotification = (person: ContactType, kind: string, setNotification: React.Dispatch<React.SetStateAction<{msg: string, kind: string}>>) => {
+
+    if (person && kind) {
+      if (kind === "notfound") {
+        setNotification({
+          msg: `${person.name} has already been removed from server`,
+          kind,
+        });
+      } else {
+        setNotification({ msg: `${person.name} was ${kind}`, kind });
+      }
+    }
+    setTimeout(() => setNotification({ msg: "", kind: "" }), 5000);
+  };
+
+
 
 export default App;
