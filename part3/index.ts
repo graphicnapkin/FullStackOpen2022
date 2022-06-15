@@ -1,46 +1,26 @@
 import express from "express";
+import morgan from "morgan";
+
+//create app
 const app = express();
 app.use(express.json());
 
-const contactList: { persons: Contact[] } = {
-  persons: [
-    {
-      name: "Arto Hellas",
-      number: "040-123456",
-      id: 1,
-    },
-    {
-      name: "Ada Lovelace",
-      number: "39-44-5323523",
-      id: 2,
-    },
-    {
-      name: "Dan Abramov",
-      number: "12-43-234345",
-      id: 3,
-    },
-    {
-      name: "Mary Poppendieck",
-      number: "39-23-6423122",
-      id: 4,
-    },
-  ],
-};
+//setup logging
+app.use(morgan(":method :url :body"));
+morgan.token("body", (req, _) => {
+  // @ts-ignore Doesn't think body is in req type
+  return JSON.stringify(req.body);
+});
 
-interface Contact {
-  name: string;
-  number: string;
-  id: number;
-}
-
+import contactsList from "./basePeople";
+//make copy so that we can edit imported variable
+let contacts = contactsList;
 //get all
-app.get("/api/people", (_, res) => res.send(contactList));
+app.get("/api/people", (_, res) => res.send(contacts));
 
 //get by id
 app.get("/api/people/:id", ({ params: { id } }, res) => {
-  const person = contactList.persons.find(
-    (person) => person.id === parseInt(id)
-  );
+  const person = contacts.find((person) => person.id === parseInt(id));
   person ? res.json(person) : res.status(404).end();
 });
 
@@ -51,27 +31,25 @@ app.post("/api/people/", ({ body }, res) => {
       error: "content missing",
     });
   }
-  if (contactList.persons.find((person) => body.name === person.name)) {
+  if (contacts.find((person) => body.name === person.name)) {
     return res.status(400).json({ error: "name must be unique" });
   }
-  const maxId = Math.random() * 100000;
-  const person = body as Contact;
+  const maxId = Math.random() * 1000;
+  const person = body;
   person.id = maxId + 1;
-  contactList.persons.push(person);
+  contacts.push(person);
   res.json(person);
 });
 
 //delete by id
 app.delete("/api/people/:id", ({ params: { id } }, res) => {
-  contactList.persons = contactList.persons.filter(
-    (person) => person.id !== parseInt(id)
-  );
+  contacts = contacts.filter((person) => person.id !== parseInt(id));
   res.status(204).end();
 });
 
 //get info
 app.get("/info", (req, res) =>
-  res.send(`Phonebook has info for ${contactList.persons.length} people
+  res.send(`Phonebook has info for ${contacts.length} people
         ${new Date().toLocaleString()}`)
 );
 
