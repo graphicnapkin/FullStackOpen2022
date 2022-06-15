@@ -1,5 +1,6 @@
 import express from "express";
 import morgan from "morgan";
+import cors from "cors";
 
 //create app
 const app = express();
@@ -11,6 +12,9 @@ morgan.token("body", (req, _) => {
   // @ts-ignore Doesn't think body is in req type
   return JSON.stringify(req.body);
 });
+
+//use cors
+app.use(cors());
 
 import contactsList from "./basePeople";
 //make copy so that we can edit imported variable
