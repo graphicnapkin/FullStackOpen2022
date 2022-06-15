@@ -1,10 +1,12 @@
-import express from "express";
-import morgan from "morgan";
-import cors from "cors";
+import express = require("express");
+import morgan = require("morgan");
+import cors = require("cors");
 
 //create app
 const app = express();
 app.use(express.json());
+//set /build directory for static files
+app.use(express.static("build"));
 
 //setup logging
 app.use(morgan(":method :url :body"));
@@ -57,5 +59,5 @@ app.get("/info", (req, res) =>
         ${new Date().toLocaleString()}`)
 );
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server runnong on port ${PORT}`));
