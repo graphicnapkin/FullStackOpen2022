@@ -1,6 +1,9 @@
 import express = require("express");
 import morgan = require("morgan");
 import cors = require("cors");
+import Contact from "./models/contacts";
+import contactsList from "./basePeople";
+require("dotenv").config();
 
 //create app
 const app = express();
@@ -18,11 +21,12 @@ morgan.token("body", (req, _) => {
 //use cors
 app.use(cors());
 
-import contactsList from "./basePeople";
 //make copy so that we can edit imported variable
 let contacts = contactsList;
 //get all
-app.get("/api/people", (_, res) => res.send(contacts));
+app.get("/api/people", (_, res) =>
+  Contact.find({}).then((results) => res.json(results))
+);
 
 //get by id
 app.get("/api/people/:id", ({ params: { id } }, res) => {
@@ -54,10 +58,10 @@ app.delete("/api/people/:id", ({ params: { id } }, res) => {
 });
 
 //get info
-app.get("/info", (req, res) =>
+app.get("/info", (_, res) =>
   res.send(`Phonebook has info for ${contacts.length} people
         ${new Date().toLocaleString()}`)
 );
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT;
 app.listen(PORT, () => console.log(`Server runnong on port ${PORT}`));
