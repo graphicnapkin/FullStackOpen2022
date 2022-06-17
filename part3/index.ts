@@ -1,4 +1,5 @@
 import express = require("express");
+import { Request, Response, NextFunction } from "express";
 import morgan = require("morgan");
 import cors = require("cors");
 import Contact from "./models/contacts";
@@ -21,17 +22,35 @@ morgan.token("body", (req, _) => {
 //use cors
 app.use(cors());
 
-//make copy so that we can edit imported variable
-let contacts = contactsList;
 //get all
 app.get("/api/people", (_, res) =>
   Contact.find({}).then((results) => res.json(results))
 );
 
 //get by id
-app.get("/api/people/:id", ({ params: { id } }, res) => {
-  const person = contacts.find((person) => person.id === parseInt(id));
-  person ? res.json(person) : res.status(404).end();
+app.get("/api/people/:id", ({ params: { id } }, res, next) => {
+  Contact.findById(id)
+    .then((person) => res.json(person))
+    .catch((err) => next(err));
+});
+
+//update user
+app.put("/api/people/:id", (req, res, next) => {
+  console.log("made it");
+  const person = {
+    name: req.body.name,
+    number: req.body.number,
+  };
+  Contact.findByIdAndUpdate(req.params.id, person, { new: true })
+    .then((result) => res.json(result))
+    .catch((err) => next(err));
+});
+
+//delete by id
+app.delete("/api/people/:id", ({ params: { id } }, res, next) => {
+  Contact.findByIdAndRemove(id)
+    .then((result) => res.status(204).end())
+    .catch((err) => next(err));
 });
 
 //add from body
@@ -41,27 +60,47 @@ app.post("/api/people/", ({ body }, res) => {
       error: "content missing",
     });
   }
-  if (contacts.find((person) => body.name === person.name)) {
-    return res.status(400).json({ error: "name must be unique" });
-  }
-  const maxId = Math.random() * 1000;
-  const person = body;
-  person.id = maxId + 1;
-  contacts.push(person);
-  res.json(person);
-});
 
-//delete by id
-app.delete("/api/people/:id", ({ params: { id } }, res) => {
-  contacts = contacts.filter((person) => person.id !== parseInt(id));
-  res.status(204).end();
-});
+  const person = new Contact({
+    name: body.name,
+    number: body.number,
+  });
 
+  person.save().then((savedContact: {}) => res.json(savedContact));
+});
 //get info
-app.get("/info", (_, res) =>
-  res.send(`Phonebook has info for ${contacts.length} people
-        ${new Date().toLocaleString()}`)
-);
+app.get("/info", (_, res) => {
+  const contacts = Contact.find({}).then((results) => {
+    res.send(
+      `Phonebook has info for ${
+        results.length
+      } people${new Date().toLocaleString()}`
+    );
+  });
+});
+
+const unknownEndpoint = (req: Request, response: Response) => {
+  response.status(404).send({ error: "unknown endpoint" });
+};
+
+app.use(unknownEndpoint);
+
+const errorHandler = (
+  err: Error,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  console.error(err.message);
+
+  if (err.name === "CastError") {
+    return res.status(400).send({ error: "malformatted id" });
+  }
+
+  next(err);
+};
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => console.log(`Server runnong on port ${PORT}`));
