@@ -6,8 +6,23 @@ connect(process.env.MONGODB_URI as string)
   .catch((err) => console.log(err));
 
 const contactSchema = new Schema({
-  name: String,
-  number: String,
+  name: {
+    type: String,
+    minLength: 3,
+    required: true,
+    unique: true,
+  },
+  number: {
+    type: String,
+    required: false,
+    validate: {
+      validator: function (v: string) {
+        return /\d{3}-\d{3}-\d{4}/.test(v);
+      },
+      message: (props: { value: string }) =>
+        `${props.value} is not a valid phone number!`,
+    },
+  },
 });
 
 contactSchema.set("toJSON", {

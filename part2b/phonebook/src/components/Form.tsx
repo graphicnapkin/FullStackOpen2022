@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { ContactType } from "../types";
 import { makeContact, updateContact } from "./api";
+import AlertMessage from "./Message";
 
 const Form = ({ persons, setPersons }: FormProps) => {
   const [newContact, setNewContact] = useState<ContactType>({} as ContactType);
+  const [errMessage, setErrMessage] = useState("")
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     const existingContact = persons.find(
@@ -26,10 +28,16 @@ const Form = ({ persons, setPersons }: FormProps) => {
       }
       return;
     }
-    const response = makeContact(newContact);
-    response.then((data) => setPersons([...persons, data], data, "added"));
+    const response = makeContact(newContact)
+      .then((data) => setPersons([...persons, data], data, "added"))
+      .catch((err) => {
+        setErrMessage(err.response.data.error);
+        setTimeout(() => setErrMessage(""), 5000)
+      })
   };
 
+  if(errMessage) return <AlertMessage msg={errMessage} kind={"err"}/>
+    
   return (
     <div>
       <h1>add a new</h1>

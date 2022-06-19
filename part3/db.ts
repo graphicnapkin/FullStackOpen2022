@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+import Contact from "./models/contacts";
+
 //import mongoose from "mongoose";
 
 if (process.argv.length < 3) {
@@ -12,20 +14,13 @@ const [password, newName, newNumber] = process.argv.slice(2);
 
 const uri = `mongodb+srv://fullStackOpenUser:${password}@fullstackopen-cluster.chfhbsf.mongodb.net/?retryWrites=true&w=majority`;
 
-const contactSchema = new mongoose.Schema({
-  name: String,
-  number: String,
-});
-
-const Contact = mongoose.model("Contact", contactSchema);
-
 mongoose
   .connect(uri)
   .then(() => {
     console.log("connected");
     if (!newName) {
       console.log("phonebook:");
-      Contact.find({}).then((result: []) => {
+      Contact.find({}).then((result) => {
         result.forEach((contact: { name: string; number: string }) =>
           console.log(`${contact.name} ${contact.number}`)
         );

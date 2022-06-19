@@ -1,6 +1,6 @@
 import React from "react";
 
-const Notificaiton = ({ msg, kind }: NotificationProps) => {
+const ALertMessage = ({ msg, kind }: NotificationProps) => {
   if (!msg) return null;
   return <div style={{ ...styles[kind || ""] }}>{msg}</div>;
 };
@@ -30,6 +30,10 @@ const styles: { [kind: string]: React.CSSProperties } = {
     color: "black",
     ...baseStyle,
   },
+  err: {
+    color: "red",
+    ...baseStyle,
+  },
 };
 
-export default Notificaiton;
+export default ALertMessage;

@@ -3,7 +3,6 @@ import { Request, Response, NextFunction } from "express";
 import morgan = require("morgan");
 import cors = require("cors");
 import Contact from "./models/contacts";
-import contactsList from "./basePeople";
 require("dotenv").config();
 
 //create app
@@ -41,7 +40,11 @@ app.put("/api/people/:id", (req, res, next) => {
     name: req.body.name,
     number: req.body.number,
   };
-  Contact.findByIdAndUpdate(req.params.id, person, { new: true })
+  Contact.findByIdAndUpdate(req.params.id, person, {
+    new: true,
+    runValidators: true,
+    context: "query",
+  })
     .then((result) => res.json(result))
     .catch((err) => next(err));
 });
@@ -54,8 +57,8 @@ app.delete("/api/people/:id", ({ params: { id } }, res, next) => {
 });
 
 //add from body
-app.post("/api/people/", ({ body }, res) => {
-  if (!body || !body.name || !body.number) {
+app.post("/api/people/", ({ body }, res, next) => {
+  if (!body || !body.name) {
     return res.status(400).json({
       error: "content missing",
     });
@@ -66,8 +69,12 @@ app.post("/api/people/", ({ body }, res) => {
     number: body.number,
   });
 
-  person.save().then((savedContact: {}) => res.json(savedContact));
+  person
+    .save()
+    .then((savedContact: {}) => res.json(savedContact))
+    .catch((err: Error) => next(err));
 });
+
 //get info
 app.get("/info", (_, res) => {
   const contacts = Contact.find({}).then((results) => {
@@ -97,6 +104,10 @@ const errorHandler = (
     return res.status(400).send({ error: "malformatted id" });
   }
 
+  if (err.name === "ValidationError") {
+    console.log(err);
+    return res.status(400).json({ error: err.message });
+  }
   next(err);
 };
 
