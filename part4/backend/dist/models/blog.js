@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var mongoose = require('mongoose');
+//import { Model } from 'mongoose'
 var blogSchema = new mongoose.Schema({
     title: {
         type: String,
@@ -18,5 +19,11 @@ var blogSchema = new mongoose.Schema({
     },
     likes: Number,
 });
+//const BlogModel: Model<{
+//title: string
+// author: string
+// url: string | undefined
+// likes: number | undefined
+//}>
 var BlogModel = mongoose.model('Blog', blogSchema);
 exports.default = BlogModel;
