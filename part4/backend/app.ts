@@ -1,6 +1,6 @@
 import { Request, Response, Application, NextFunction } from 'express'
 import config from './utils/config'
-const express = require('express')
+import express from 'express'
 const app: Application = express()
 import blogRouter from './controllers/blog'
 import {
@@ -16,7 +16,7 @@ mongoose
   .then(() => info('Connected to DB'))
   .catch((err: Error) => logError('error connecting to DB:', err))
 
-const cors = require('cors')
+import cors from 'cors'
 
 app.use(cors())
 app.use(express.static('build'))

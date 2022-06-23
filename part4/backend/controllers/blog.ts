@@ -3,14 +3,14 @@ import Blog from '../models/blog'
 const blogRouter: Router = require('express').Router()
 
 blogRouter.get('/', (_, response) => {
-  Blog.find({}).then((blogs) => {
+  Blog.find({}).then((blogs: any) => {
     response.json(blogs)
   })
 })
 
 blogRouter.get('/:id', (request, response, next) => {
   Blog.findById(request.params.id)
-    .then((blog) => {
+    .then((blog: any) => {
       if (blog) {
         response.json(blog)
       } else {
@@ -36,7 +36,7 @@ blogRouter.put('/:id', (request, response, next) => {
     likes: body.likes,
   }
   Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
-    .then((updatedBlog) => response.json(updatedBlog))
+    .then((updatedBlog: any) => response.json(updatedBlog))
     .catch((err: Error) => next(err))
 })
 
@@ -46,11 +46,11 @@ blogRouter.delete('/:id', (request, response, next) => {
     .catch((err: Error) => next(err))
 })
 
-interface BlogInterface {
+export interface BlogInterface {
   title: string
   author: string
   url: string | undefined
-  likes: number | undefined
+  likes: number
 }
 
 export default blogRouter

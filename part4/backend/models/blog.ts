@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-import { Model } from 'mongoose'
+//import { Model } from 'mongoose'
 
 const blogSchema = new mongoose.Schema({
   title: {
@@ -19,11 +19,12 @@ const blogSchema = new mongoose.Schema({
   likes: Number,
 })
 
-const BlogModel: Model<{
-  title: string
-  author: string
-  url: string | undefined
-  likes: number | undefined
-}> = mongoose.model('Blog', blogSchema)
+//const BlogModel: Model<{
+//title: string
+// author: string
+// url: string | undefined
+// likes: number | undefined
+//}>
+const BlogModel = mongoose.model('Blog', blogSchema)
 
 export default BlogModel
