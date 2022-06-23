@@ -28,4 +28,5 @@ app.use('/api/blog', blogRouter)
 app.use(unknownEndpoint)
 app.use(errorHandler)
 
+module.exports = app
 export default app

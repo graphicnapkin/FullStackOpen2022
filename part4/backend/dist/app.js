@@ -22,4 +22,5 @@ app.use(middleware_1.requestLogger);
 app.use('/api/blog', blog_1.default);
 app.use(middleware_1.unknownEndpoint);
 app.use(middleware_1.errorHandler);
+module.exports = app;
 exports.default = app;
