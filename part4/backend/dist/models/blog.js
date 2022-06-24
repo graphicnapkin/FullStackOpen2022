@@ -26,4 +26,5 @@ var blogSchema = new mongoose.Schema({
 // likes: number | undefined
 //}>
 var BlogModel = mongoose.model('Blog', blogSchema);
+//module.exports = { BlogModel, default: BlogModel }
 exports.default = BlogModel;

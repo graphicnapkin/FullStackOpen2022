@@ -26,5 +26,5 @@ const blogSchema = new mongoose.Schema({
 // likes: number | undefined
 //}>
 const BlogModel = mongoose.model('Blog', blogSchema)
-
+//module.exports = { BlogModel, default: BlogModel }
 export default BlogModel
