@@ -13,10 +13,6 @@ export const requestLogger = (
   next()
 }
 
-export const unknownEndpoint = (request: Request, response: Response) => {
-  response.status(404).send({ error: 'unknown endpoint' })
-}
-
 export const errorHandler = (
   error: Error,
   request: Request,
@@ -24,6 +20,7 @@ export const errorHandler = (
   next: NextFunction
 ) => {
   logError(error.message)
+  //  console.log('name ', error.name)
 
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
@@ -32,4 +29,8 @@ export const errorHandler = (
   }
 
   next(error)
+}
+
+export const unknownEndpoint = (request: Request, response: Response) => {
+  response.status(404).send({ error: 'unknown endpoint' })
 }

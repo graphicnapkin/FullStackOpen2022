@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.errorHandler = exports.unknownEndpoint = exports.requestLogger = void 0;
+exports.unknownEndpoint = exports.errorHandler = exports.requestLogger = void 0;
 var logger_1 = require("./logger");
 var requestLogger = function (request, response, next) {
     (0, logger_1.info)('Method:', request.method);
@@ -10,12 +10,9 @@ var requestLogger = function (request, response, next) {
     next();
 };
 exports.requestLogger = requestLogger;
-var unknownEndpoint = function (request, response) {
-    response.status(404).send({ error: 'unknown endpoint' });
-};
-exports.unknownEndpoint = unknownEndpoint;
 var errorHandler = function (error, request, response, next) {
     (0, logger_1.logError)(error.message);
+    //  console.log('name ', error.name)
     if (error.name === 'CastError') {
         return response.status(400).send({ error: 'malformatted id' });
     }
@@ -25,3 +22,7 @@ var errorHandler = function (error, request, response, next) {
     next(error);
 };
 exports.errorHandler = errorHandler;
+var unknownEndpoint = function (request, response) {
+    response.status(404).send({ error: 'unknown endpoint' });
+};
+exports.unknownEndpoint = unknownEndpoint;

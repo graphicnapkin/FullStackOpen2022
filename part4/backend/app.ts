@@ -9,24 +9,27 @@ import {
   errorHandler,
 } from './utils/middleware'
 import { info, logError } from './utils/logger'
-
-const mongoose = require('mongoose')
-mongoose
-  .connect(config.MONGODB_URI)
-  .then(() => info('Connected to DB'))
-  .catch((err: Error) => logError('error connecting to DB:', err))
-
 import cors from 'cors'
+const mongoose = require('mongoose')
 
-app.use(cors())
-app.use(express.static('build'))
-app.use(express.json())
-app.use(requestLogger)
+const main = async () => {
+  try {
+    mongoose.connect(config.MONGODB_URI)
+    info('Connected to DB')
+  } catch (err) {
+    logError('error connecting to DB:', err)
+  }
+  app.use(cors())
+  app.use(express.static('build'))
+  app.use(express.json())
+  app.use(requestLogger)
 
-app.use('/api/blog', blogRouter)
+  app.use('/api/blog', blogRouter)
+  app.use(errorHandler)
+  app.use(unknownEndpoint)
+}
 
-app.use(unknownEndpoint)
-app.use(errorHandler)
+main()
 
 module.exports = app
 export default app

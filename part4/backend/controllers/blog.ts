@@ -2,48 +2,59 @@ import { Router } from 'express'
 import Blog from '../models/blog'
 const blogRouter: Router = require('express').Router()
 
-blogRouter.get('/', (_, response) => {
-  Blog.find({}).then((blogs: any) => {
-    response.json(blogs)
-  })
+blogRouter.get('/', async (_, response) => {
+  const blogs = await Blog.find({})
+  response.json(blogs)
 })
 
-blogRouter.get('/:id', (request, response, next) => {
-  Blog.findById(request.params.id)
-    .then((blog: any) => {
-      if (blog) {
-        response.json(blog)
-      } else {
-        response.status(404).end()
-      }
-    })
-    .catch((err: Error) => next(err))
-})
-
-blogRouter.post('/', (request, response) => {
-  const blog = new Blog(request.body)
-  blog.save().then((result: BlogInterface[]) => {
-    response.status(201).json(result)
-  })
-})
-
-blogRouter.put('/:id', (request, response, next) => {
-  const body = request.body
-  const blog = {
-    title: body.title,
-    author: body.author,
-    url: body.url,
-    likes: body.likes,
+blogRouter.get('/:id', async (request, response, next) => {
+  try {
+    const blog = await Blog.findById(request.params.id)
+    if (blog) {
+      response.json(blog)
+    } else {
+      response.status(404).end()
+    }
+  } catch (err) {
+    next(err)
   }
-  Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
-    .then((updatedBlog: any) => response.json(updatedBlog))
-    .catch((err: Error) => next(err))
 })
 
-blogRouter.delete('/:id', (request, response, next) => {
-  Blog.findByIdAndDelete(request.params.id)
-    .then(() => response.status(204).end())
-    .catch((err: Error) => next(err))
+blogRouter.post('/', async (request, response, next) => {
+  try {
+    const blog = new Blog(request.body)
+    const result = await blog.save()
+    response.status(201).json(result)
+  } catch (err) {
+    next(err)
+  }
+})
+
+blogRouter.put('/:id', async (request, response, next) => {
+  const { title, author, url, likes } = request.body
+  const blog = {
+    title,
+    author,
+    url,
+    likes,
+  }
+  try {
+    const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, {
+      new: true,
+    })
+    response.json(updatedBlog)
+  } catch (err) {
+    next(err)
+  }
+})
+
+blogRouter.delete('/:id', async (request, response, next) => {
+  try {
+    await Blog.findByIdAndDelete(request.params.id)
+    response.status(204).end()
+  } catch (err) {
+    next(err)
+  }
 })
 
 export interface BlogInterface {
