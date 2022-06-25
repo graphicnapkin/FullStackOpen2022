@@ -19,6 +19,13 @@ var blogSchema = new mongoose.Schema({
     },
     likes: Number,
 });
+blogSchema.set('toJSON', {
+    transform: function (_, returnedObject) {
+        returnedObject.id = returnedObject._id.toString();
+        delete returnedObject._id;
+        delete returnedObject.__v;
+    },
+});
 //const BlogModel: Model<{
 //title: string
 // author: string

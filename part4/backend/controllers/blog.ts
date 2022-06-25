@@ -8,26 +8,20 @@ blogRouter.get('/', async (_, response) => {
 })
 
 blogRouter.get('/:id', async (request, response, next) => {
-  try {
-    const blog = await Blog.findById(request.params.id)
-    if (blog) {
-      response.json(blog)
-    } else {
-      response.status(404).end()
-    }
-  } catch (err) {
-    next(err)
+  const blog = await Blog.findById(request.params.id)
+  if (blog) {
+    response.json(blog)
+  } else {
+    response.status(404).end()
   }
 })
 
 blogRouter.post('/', async (request, response, next) => {
-  try {
-    const blog = new Blog(request.body)
-    const result = await blog.save()
-    response.status(201).json(result)
-  } catch (err) {
-    next(err)
-  }
+  const blogObject = request.body
+  if (!blogObject.likes) blogObject.likes = 0
+  const blog = new Blog(blogObject)
+  const result = await blog.save()
+  response.status(201).json(result)
 })
 
 blogRouter.put('/:id', async (request, response, next) => {
@@ -38,23 +32,15 @@ blogRouter.put('/:id', async (request, response, next) => {
     url,
     likes,
   }
-  try {
-    const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, {
-      new: true,
-    })
-    response.json(updatedBlog)
-  } catch (err) {
-    next(err)
-  }
+  const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, {
+    new: true,
+  })
+  response.json(updatedBlog)
 })
 
 blogRouter.delete('/:id', async (request, response, next) => {
-  try {
-    await Blog.findByIdAndDelete(request.params.id)
-    response.status(204).end()
-  } catch (err) {
-    next(err)
-  }
+  await Blog.findByIdAndDelete(request.params.id)
+  response.status(204).end()
 })
 
 export interface BlogInterface {

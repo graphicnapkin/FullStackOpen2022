@@ -41,6 +41,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var config_1 = __importDefault(require("./utils/config"));
 var express_1 = __importDefault(require("express"));
+require('express-async-errors');
 var app = (0, express_1.default)();
 var blog_1 = __importDefault(require("./controllers/blog"));
 var middleware_1 = require("./utils/middleware");

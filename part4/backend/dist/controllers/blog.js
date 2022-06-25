@@ -54,12 +54,10 @@ blogRouter.get('/', function (_, response) { return __awaiter(void 0, void 0, vo
     });
 }); });
 blogRouter.get('/:id', function (request, response, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var blog, err_1;
+    var blog;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0:
-                _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, blog_1.default.findById(request.params.id)];
+            case 0: return [4 /*yield*/, blog_1.default.findById(request.params.id)];
             case 1:
                 blog = _a.sent();
                 if (blog) {
@@ -68,37 +66,29 @@ blogRouter.get('/:id', function (request, response, next) { return __awaiter(voi
                 else {
                     response.status(404).end();
                 }
-                return [3 /*break*/, 3];
-            case 2:
-                err_1 = _a.sent();
-                next(err_1);
-                return [3 /*break*/, 3];
-            case 3: return [2 /*return*/];
+                return [2 /*return*/];
         }
     });
 }); });
 blogRouter.post('/', function (request, response, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var blog, result, err_2;
+    var blogObject, blog, result;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                _a.trys.push([0, 2, , 3]);
-                blog = new blog_1.default(request.body);
+                blogObject = request.body;
+                if (!blogObject.likes)
+                    blogObject.likes = 0;
+                blog = new blog_1.default(blogObject);
                 return [4 /*yield*/, blog.save()];
             case 1:
                 result = _a.sent();
                 response.status(201).json(result);
-                return [3 /*break*/, 3];
-            case 2:
-                err_2 = _a.sent();
-                next(err_2);
-                return [3 /*break*/, 3];
-            case 3: return [2 /*return*/];
+                return [2 /*return*/];
         }
     });
 }); });
 blogRouter.put('/:id', function (request, response, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, title, author, url, likes, blog, updatedBlog, err_3;
+    var _a, title, author, url, likes, blog, updatedBlog;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
@@ -109,40 +99,24 @@ blogRouter.put('/:id', function (request, response, next) { return __awaiter(voi
                     url: url,
                     likes: likes,
                 };
-                _b.label = 1;
-            case 1:
-                _b.trys.push([1, 3, , 4]);
                 return [4 /*yield*/, blog_1.default.findByIdAndUpdate(request.params.id, blog, {
                         new: true,
                     })];
-            case 2:
+            case 1:
                 updatedBlog = _b.sent();
                 response.json(updatedBlog);
-                return [3 /*break*/, 4];
-            case 3:
-                err_3 = _b.sent();
-                next(err_3);
-                return [3 /*break*/, 4];
-            case 4: return [2 /*return*/];
+                return [2 /*return*/];
         }
     });
 }); });
 blogRouter.delete('/:id', function (request, response, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var err_4;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0:
-                _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, blog_1.default.findByIdAndDelete(request.params.id)];
+            case 0: return [4 /*yield*/, blog_1.default.findByIdAndDelete(request.params.id)];
             case 1:
                 _a.sent();
                 response.status(204).end();
-                return [3 /*break*/, 3];
-            case 2:
-                err_4 = _a.sent();
-                next(err_4);
-                return [3 /*break*/, 3];
-            case 3: return [2 /*return*/];
+                return [2 /*return*/];
         }
     });
 }); });

@@ -14,10 +14,14 @@ test('notes are returned as json', async () => {
 
 beforeEach(async () => {
   await Blog.deleteMany({})
-  for (let i = 0; i < initialBlogs.length; i++) {
-    const blog = new Blog(initialBlogs[i])
-    await blog.save()
-  }
+  //for (let i = 0; i < initialBlogs.length; i++) {
+  // const blog = new Blog(initialBlogs[i])
+  // await blog.save()
+  // }
+  const blogPromises = initialBlogs
+    .map((blog) => new Blog(blog))
+    .map((blog) => blog.save())
+  await Promise.all(blogPromises)
 })
 
 test('all notes are returned', async () => {
@@ -54,13 +58,22 @@ test('a blog without an author is not added', async () => {
 test('a blog can be deleted', async () => {
   const blogs = await blogsInDb()
   const blogToDelete = blogs[0]
-  console.log(typeof blogToDelete._id.toString(), blogToDelete._id.toString())
-  await api.delete(`/api/blog/${blogToDelete._id.toString()}`).expect(204)
+  await api.delete(`/api/blog/${blogToDelete.id}`).expect(204)
 
   const blogsAtEnd = await blogsInDb()
 
   expect(blogsAtEnd).toHaveLength(initialBlogs.length - 1)
   expect(blogsAtEnd.map((r) => r.title)).not.toContain(blogToDelete.title)
+})
+
+test('a blog created without passing likes is defaulted to 0', async () => {
+  const newBlog = {
+    author: 'No Likes',
+    title: 'No Likes',
+    url: 'https://nolikes.com',
+  }
+  const response = await api.post('/api/blog').send(newBlog)
+  expect(response.body.likes).toEqual(0)
 })
 
 afterAll(() => mongoose.connection.close())

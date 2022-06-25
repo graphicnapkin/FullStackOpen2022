@@ -1,6 +1,7 @@
 import { Request, Response, Application, NextFunction } from 'express'
 import config from './utils/config'
 import express from 'express'
+require('express-async-errors')
 const app: Application = express()
 import blogRouter from './controllers/blog'
 import {
