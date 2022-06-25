@@ -14,10 +14,10 @@ test('notes are returned as json', async () => {
 
 beforeEach(async () => {
   await Blog.deleteMany({})
-  let blogObject = new Blog(initialBlogs[0])
-  await blogObject.save()
-  blogObject = new Blog(initialBlogs[1])
-  await blogObject.save()
+  for (let i = 0; i < initialBlogs.length; i++) {
+    const blog = new Blog(initialBlogs[i])
+    await blog.save()
+  }
 })
 
 test('all notes are returned', async () => {
