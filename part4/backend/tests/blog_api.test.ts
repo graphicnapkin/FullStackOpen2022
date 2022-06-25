@@ -1,10 +1,9 @@
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../dist/app')
-//const Blog = require('../models/blog')
-import Blog from '../models/blog'
-// import { BlogType } from '../models/blog'
 const api = supertest(app)
+
+const Blog = mongoose.models.Blog
 
 test('notes are returned as json', async () => {
   await api
@@ -22,12 +21,12 @@ beforeEach(async () => {
 })
 
 test('all notes are returned', async () => {
-  const response = await api.get('api/blog')
+  const response = await api.get('/api/blog')
 
   expect(response.body).toHaveLength(initialBlogs.length)
 })
 
-export const initialBlogs = [
+const initialBlogs = [
   {
     _id: '5a422a851b54a676234d17f7',
     title: 'React patterns',
