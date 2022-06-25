@@ -76,4 +76,16 @@ test('a blog created without passing likes is defaulted to 0', async () => {
   expect(response.body.likes).toEqual(0)
 })
 
+test("a blog's likes can be update", async () => {
+  const blogs = await blogsInDb()
+  const updatedBlog = blogs[0]
+  updatedBlog.likes++
+
+  const response = await api
+    .put(`/api/blog/${updatedBlog.id}`)
+    .send(updatedBlog)
+
+  expect(response.body.likes).toEqual(updatedBlog.likes)
+})
+
 afterAll(() => mongoose.connection.close())
