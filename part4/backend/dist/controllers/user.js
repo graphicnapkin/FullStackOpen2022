@@ -70,6 +70,11 @@ userRouter.post('/', function (_a, response, next) {
                     if (existingUser) {
                         return [2 /*return*/, response.status(400).json({ error: 'username must be unique' })];
                     }
+                    if (username.length < 3 || password.length < 3) {
+                        return [2 /*return*/, response
+                                .status(400)
+                                .json({ error: 'username and passwordmust be at least 3 characters' })];
+                    }
                     saltRounds = 10;
                     return [4 /*yield*/, bcrypt_1.default.hash(password, saltRounds)];
                 case 2:

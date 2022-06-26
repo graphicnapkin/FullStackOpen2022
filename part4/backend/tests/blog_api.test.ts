@@ -5,13 +5,8 @@ const api = supertest(app)
 const Blog = mongoose.models.Blog
 const User = mongoose.models.User
 
+let token = ''
 const { initialBlogs, nonExistingId, blogsInDb } = require('./test_helper')
-test('notes are returned as json', async () => {
-  await api
-    .get('/api/blogs')
-    .expect(200)
-    .expect('Content-Type', /application\/json/)
-})
 
 beforeEach(async () => {
   await Blog.deleteMany({})
@@ -19,6 +14,18 @@ beforeEach(async () => {
     .map((blog) => new Blog(blog))
     .map((blog) => blog.save())
   await Promise.all(blogPromises)
+
+  const user = await api
+    .post('/api/login')
+    .send({ username: 'root', password: 'sekret' })
+  token = `Bearer ${user.body.token}`
+})
+
+test('notes are returned as json', async () => {
+  await api
+    .get('/api/blogs')
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
 })
 
 test('all notes are returned', async () => {
@@ -41,6 +48,7 @@ test('a valid blog can be added', async () => {
 
   await api
     .post('/api/blogs')
+    .set('Authorization', token)
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
@@ -59,7 +67,12 @@ test('a blog without an author is not added', async () => {
     likes: 0,
     userId,
   }
-  await api.post('/api/blogs').send(newBlog).expect(400)
+
+  await api
+    .post('/api/blogs')
+    .set('Authorization', token)
+    .send(newBlog)
+    .expect(400)
 
   const blogsAtEnd = await blogsInDb()
   expect(blogsAtEnd).toHaveLength(initialBlogs.length)
@@ -68,7 +81,10 @@ test('a blog without an author is not added', async () => {
 test('a blog can be deleted', async () => {
   const blogs = await blogsInDb()
   const blogToDelete = blogs[0]
-  await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204)
+  await api
+    .delete(`/api/blogs/${blogToDelete.id}`)
+    .set('Authorization', token)
+    .expect(204)
 
   const blogsAtEnd = await blogsInDb()
 
@@ -86,7 +102,10 @@ test('a blog created without passing likes is defaulted to 0', async () => {
     url: 'https://nolikes.com',
     userId,
   }
-  const response = await api.post('/api/blogs').send(newBlog)
+  const response = await api
+    .post('/api/blogs')
+    .set('Authorization', token)
+    .send(newBlog)
   expect(response.body.likes).toEqual(0)
 })
 

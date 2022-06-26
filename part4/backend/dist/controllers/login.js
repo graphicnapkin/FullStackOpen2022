@@ -39,38 +39,41 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var config_1 = __importDefault(require("./utils/config"));
-var express_1 = __importDefault(require("express"));
-require('express-async-errors');
-var app = (0, express_1.default)();
-var blog_1 = __importDefault(require("./controllers/blog"));
-var user_1 = __importDefault(require("./controllers/user"));
-var login_1 = __importDefault(require("./controllers/login"));
-var middleware_1 = require("./utils/middleware");
-var logger_1 = require("./utils/logger");
-var cors_1 = __importDefault(require("cors"));
-var mongoose = require('mongoose');
-var main = function () { return __awaiter(void 0, void 0, void 0, function () {
-    return __generator(this, function (_a) {
-        try {
-            mongoose.connect(config_1.default.MONGODB_URI);
-            (0, logger_1.info)('Connected to DB');
+var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+var bcrypt_1 = __importDefault(require("bcrypt"));
+var user_1 = __importDefault(require("../models/user"));
+var loginRouter = require('express').Router();
+loginRouter.post('/', function (request, response) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, username, password, user, passwordCorrect, _b, userForToken, token;
+    return __generator(this, function (_c) {
+        switch (_c.label) {
+            case 0:
+                _a = request.body, username = _a.username, password = _a.password;
+                return [4 /*yield*/, user_1.default.findOne({ username: username })];
+            case 1:
+                user = _c.sent();
+                if (!(user === null)) return [3 /*break*/, 2];
+                _b = false;
+                return [3 /*break*/, 4];
+            case 2: return [4 /*yield*/, bcrypt_1.default.compare(password, user.passwordHash)];
+            case 3:
+                _b = _c.sent();
+                _c.label = 4;
+            case 4:
+                passwordCorrect = _b;
+                if (!(user && passwordCorrect)) {
+                    return [2 /*return*/, response.status(401).json({ error: 'invalid username or password' })];
+                }
+                userForToken = {
+                    username: user.username,
+                    id: user._id,
+                };
+                token = jsonwebtoken_1.default.sign(userForToken, process.env.SECRET, {
+                    expiresIn: 60 * 60,
+                });
+                response.status(200).send({ token: token, username: user.username, name: user.name });
+                return [2 /*return*/];
         }
-        catch (err) {
-            (0, logger_1.logError)('error connecting to DB:', err);
-        }
-        app.use((0, cors_1.default)());
-        app.use(express_1.default.static('build'));
-        app.use(express_1.default.json());
-        app.use(middleware_1.requestLogger);
-        app.use('/api/blogs', blog_1.default);
-        app.use('/api/users', user_1.default);
-        app.use('/api/login', login_1.default);
-        app.use(middleware_1.errorHandler);
-        app.use(middleware_1.unknownEndpoint);
-        return [2 /*return*/];
     });
-}); };
-main();
-module.exports = app;
-exports.default = app;
+}); });
+exports.default = loginRouter;

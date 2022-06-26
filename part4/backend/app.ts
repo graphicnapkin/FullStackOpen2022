@@ -5,6 +5,8 @@ require('express-async-errors')
 const app: Application = express()
 import blogRouter from './controllers/blog'
 import userRouter from './controllers/user'
+import loginRouter from './controllers/login'
+
 import {
   requestLogger,
   unknownEndpoint,
@@ -28,6 +30,7 @@ const main = async () => {
 
   app.use('/api/blogs', blogRouter)
   app.use('/api/users', userRouter)
+  app.use('/api/login', loginRouter)
   app.use(errorHandler)
   app.use(unknownEndpoint)
 }
