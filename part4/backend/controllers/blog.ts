@@ -1,4 +1,5 @@
-import { Router } from 'express'
+import { Router, Request } from 'express'
+import jwt from 'jsonwebtoken'
 import Blog from '../models/blog'
 import User from '../models/user'
 const blogRouter: Router = require('express').Router()
@@ -19,8 +20,13 @@ blogRouter.get('/:id', async (request, response, next) => {
 
 blogRouter.post('/', async (request, response, next) => {
   const blogObject = request.body
+  const token = getTokenFrom(request)
+  const decodedToken = jwt.verify(token as string, process.env.SECRET as string)
+  if (typeof decodedToken == 'string' || !decodedToken?.id)
+    return response.status(401).json({ error: 'token missing or invalid' })
 
-  const user = await User.findById(blogObject.userId)
+  const user = await User.findById(decodedToken.id)
+
   blogObject.user = user._id
   if (!blogObject.likes) blogObject.likes = 0
 
@@ -51,6 +57,14 @@ blogRouter.delete('/:id', async (request, response, next) => {
   await Blog.findByIdAndDelete(request.params.id)
   response.status(204).end()
 })
+
+const getTokenFrom = (request: Request) => {
+  const auth = request.get('authorization')
+  if (auth && auth.toLowerCase().startsWith('bearer ')) {
+    return auth.substring(7)
+  }
+  return null
+}
 
 export interface BlogInterface {
   title: string
