@@ -39,36 +39,45 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var config_1 = __importDefault(require("./utils/config"));
-var express_1 = __importDefault(require("express"));
-require('express-async-errors');
-var app = (0, express_1.default)();
-var blog_1 = __importDefault(require("./controllers/blog"));
-var user_1 = __importDefault(require("./controllers/user"));
-var middleware_1 = require("./utils/middleware");
-var logger_1 = require("./utils/logger");
-var cors_1 = __importDefault(require("cors"));
-var mongoose = require('mongoose');
-var main = function () { return __awaiter(void 0, void 0, void 0, function () {
-    return __generator(this, function (_a) {
-        try {
-            mongoose.connect(config_1.default.MONGODB_URI);
-            (0, logger_1.info)('Connected to DB');
-        }
-        catch (err) {
-            (0, logger_1.logError)('error connecting to DB:', err);
-        }
-        app.use((0, cors_1.default)());
-        app.use(express_1.default.static('build'));
-        app.use(express_1.default.json());
-        app.use(middleware_1.requestLogger);
-        app.use('/api/blog', blog_1.default);
-        app.use('/api/user', user_1.default);
-        app.use(middleware_1.errorHandler);
-        app.use(middleware_1.unknownEndpoint);
-        return [2 /*return*/];
+var bcrypt_1 = __importDefault(require("bcrypt"));
+var user_1 = __importDefault(require("../models/user"));
+var userRouter = require('express').Router();
+userRouter.post('/', function (_a, response) {
+    var _b = _a.body, username = _b.username, name = _b.name, password = _b.password;
+    return __awaiter(void 0, void 0, void 0, function () {
+        var saltRounds, passwordHash, user, savedUser;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
+                case 0:
+                    saltRounds = 10;
+                    return [4 /*yield*/, bcrypt_1.default.hash(password, saltRounds)];
+                case 1:
+                    passwordHash = _c.sent();
+                    user = new user_1.default(username, name, passwordHash);
+                    return [4 /*yield*/, user.save()];
+                case 2:
+                    savedUser = _c.sent();
+                    response.status(201).json(savedUser);
+                    return [2 /*return*/];
+            }
+        });
     });
-}); };
-main();
-module.exports = app;
-exports.default = app;
+});
+userRouter.get('/:id', function (request, response, next) { return __awaiter(void 0, void 0, void 0, function () {
+    var user;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, user_1.default.findById(request.params.id)];
+            case 1:
+                user = _a.sent();
+                if (user) {
+                    response.status(201).json(user);
+                }
+                else {
+                    response.status(404).end();
+                }
+                return [2 /*return*/];
+        }
+    });
+}); });
+exports.default = userRouter;

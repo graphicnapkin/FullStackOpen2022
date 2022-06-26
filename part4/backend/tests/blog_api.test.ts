@@ -14,10 +14,6 @@ test('notes are returned as json', async () => {
 
 beforeEach(async () => {
   await Blog.deleteMany({})
-  //for (let i = 0; i < initialBlogs.length; i++) {
-  // const blog = new Blog(initialBlogs[i])
-  // await blog.save()
-  // }
   const blogPromises = initialBlogs
     .map((blog) => new Blog(blog))
     .map((blog) => blog.save())
