@@ -10,13 +10,9 @@ describe('when there is initially one user in db', () => {
   beforeEach(async () => {
     await User.deleteMany({})
 
-    try {
-      const passwordHash = await bcrypt.hash('sekret', 10)
-      const user = new User({ username: 'root', passwordHash })
-      await user.save()
-    } catch (err) {
-      console.log(err)
-    }
+    const passwordHash = await bcrypt.hash('sekret', 10)
+    const user = new User({ username: 'root', passwordHash })
+    await user.save()
   })
 
   test('creation succeeds with a fresh username', async () => {
@@ -30,12 +26,35 @@ describe('when there is initially one user in db', () => {
 
     try {
       await api
-        .post('/api/user')
+        .post('/api/users')
         .send(newUser)
         .expect(201)
         .expect('Content-Type', /application\/json/)
     } catch (err) {
       console.log(err)
     }
+    const usersAtEnd = await usersInDb()
+    expect(usersAtEnd).toHaveLength(usersAtStart.length + 1)
+
+    const usernames = usersAtEnd.map((u) => u.username)
+    expect(usernames).toContain(newUser.username)
+  })
+
+  test('creation fails with proper statuscode and message if username already taken', async () => {
+    const usersAtStart = await usersInDb()
+
+    const duplicateUser = {
+      username: 'root',
+      name: 'Superuser',
+      password: 'salainen',
+    }
+
+    const result = await api
+      .post('/api/users')
+      .send(duplicateUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    expect(result.body.error).toContain('username must be unique')
   })
 })

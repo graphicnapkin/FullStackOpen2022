@@ -26,8 +26,8 @@ const main = async () => {
   app.use(express.json())
   app.use(requestLogger)
 
-  app.use('/api/blog', blogRouter)
-  app.use('/api/user', userRouter)
+  app.use('/api/blogs', blogRouter)
+  app.use('/api/users', userRouter)
   app.use(errorHandler)
   app.use(unknownEndpoint)
 }

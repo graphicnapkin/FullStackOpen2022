@@ -42,20 +42,37 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var bcrypt_1 = __importDefault(require("bcrypt"));
 var user_1 = __importDefault(require("../models/user"));
 var userRouter = require('express').Router();
-userRouter.post('/', function (_a, response) {
+userRouter.get('/', function (request, response, next) { return __awaiter(void 0, void 0, void 0, function () {
+    var users;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, user_1.default.find({})];
+            case 1:
+                users = _a.sent();
+                response.json(users);
+                return [2 /*return*/];
+        }
+    });
+}); });
+userRouter.post('/', function (_a, response, next) {
     var _b = _a.body, username = _b.username, name = _b.name, password = _b.password;
     return __awaiter(void 0, void 0, void 0, function () {
-        var saltRounds, passwordHash, user, savedUser;
+        var existingUser, saltRounds, passwordHash, user, savedUser;
         return __generator(this, function (_c) {
             switch (_c.label) {
-                case 0:
+                case 0: return [4 /*yield*/, user_1.default.findOne({ username: username })];
+                case 1:
+                    existingUser = _c.sent();
+                    if (existingUser) {
+                        return [2 /*return*/, response.status(400).json({ error: 'username must be unique' })];
+                    }
                     saltRounds = 10;
                     return [4 /*yield*/, bcrypt_1.default.hash(password, saltRounds)];
-                case 1:
+                case 2:
                     passwordHash = _c.sent();
                     user = new user_1.default({ username: username, name: name, passwordHash: passwordHash });
                     return [4 /*yield*/, user.save()];
-                case 2:
+                case 3:
                     savedUser = _c.sent();
                     response.status(201).json(savedUser);
                     return [2 /*return*/];

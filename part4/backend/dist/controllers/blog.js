@@ -40,6 +40,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var blog_1 = __importDefault(require("../models/blog"));
+var user_1 = __importDefault(require("../models/user"));
 var blogRouter = require('express').Router();
 blogRouter.get('/', function (_, response) { return __awaiter(void 0, void 0, void 0, function () {
     var blogs;
@@ -71,18 +72,25 @@ blogRouter.get('/:id', function (request, response, next) { return __awaiter(voi
     });
 }); });
 blogRouter.post('/', function (request, response, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var blogObject, blog, result;
+    var blogObject, user, blog, savedBlog;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 blogObject = request.body;
+                return [4 /*yield*/, user_1.default.findById(blogObject.userId)];
+            case 1:
+                user = _a.sent();
+                blogObject.user = user._id;
                 if (!blogObject.likes)
                     blogObject.likes = 0;
                 blog = new blog_1.default(blogObject);
                 return [4 /*yield*/, blog.save()];
-            case 1:
-                result = _a.sent();
-                response.status(201).json(result);
+            case 2:
+                savedBlog = _a.sent();
+                if (!Array.isArray(user.notes))
+                    user.notes = [];
+                user.notes = user.notes.concat(savedBlog._id);
+                response.status(201).json(savedBlog);
                 return [2 /*return*/];
         }
     });

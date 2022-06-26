@@ -62,8 +62,8 @@ var main = function () { return __awaiter(void 0, void 0, void 0, function () {
         app.use(express_1.default.static('build'));
         app.use(express_1.default.json());
         app.use(middleware_1.requestLogger);
-        app.use('/api/blog', blog_1.default);
-        app.use('/api/user', user_1.default);
+        app.use('/api/blogs', blog_1.default);
+        app.use('/api/users', user_1.default);
         app.use(middleware_1.errorHandler);
         app.use(middleware_1.unknownEndpoint);
         return [2 /*return*/];

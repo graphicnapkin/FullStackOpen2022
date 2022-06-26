@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import Blog from '../models/blog'
+import User from '../models/user'
 const blogRouter: Router = require('express').Router()
 
 blogRouter.get('/', async (_, response) => {
@@ -18,10 +19,18 @@ blogRouter.get('/:id', async (request, response, next) => {
 
 blogRouter.post('/', async (request, response, next) => {
   const blogObject = request.body
+
+  const user = await User.findById(blogObject.userId)
+  blogObject.user = user._id
   if (!blogObject.likes) blogObject.likes = 0
+
   const blog = new Blog(blogObject)
-  const result = await blog.save()
-  response.status(201).json(result)
+  const savedBlog = await blog.save()
+
+  user.blogs = user.blogs.concat(savedBlog._id)
+  await user.save()
+
+  response.status(201).json(savedBlog)
 })
 
 blogRouter.put('/:id', async (request, response, next) => {
