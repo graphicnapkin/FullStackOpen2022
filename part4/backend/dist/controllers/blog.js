@@ -87,9 +87,10 @@ blogRouter.post('/', function (request, response, next) { return __awaiter(void 
                 return [4 /*yield*/, blog.save()];
             case 2:
                 savedBlog = _a.sent();
-                if (!Array.isArray(user.notes))
-                    user.notes = [];
-                user.notes = user.notes.concat(savedBlog._id);
+                user.blogs = user.blogs.concat(savedBlog._id);
+                return [4 /*yield*/, user.save()];
+            case 3:
+                _a.sent();
                 response.status(201).json(savedBlog);
                 return [2 /*return*/];
         }

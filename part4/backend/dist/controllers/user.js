@@ -46,7 +46,11 @@ userRouter.get('/', function (request, response, next) { return __awaiter(void 0
     var users;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, user_1.default.find({})];
+            case 0: return [4 /*yield*/, user_1.default.find({}).populate('blogs', {
+                    title: 1,
+                    author: 1,
+                    likes: 1,
+                })];
             case 1:
                 users = _a.sent();
                 response.json(users);
