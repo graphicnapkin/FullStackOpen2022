@@ -24,12 +24,13 @@ beforeEach(async () => {
 test('notes are returned as json', async () => {
   await api
     .get('/api/blogs')
+    .set('Authorization', token)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 })
 
 test('all notes are returned', async () => {
-  const response = await api.get('/api/blogs')
+  const response = await api.get('/api/blogs').set('Authorization', token)
   expect(response.body).toHaveLength(initialBlogs.length)
 })
 
@@ -116,6 +117,7 @@ test("a blog's likes can be update", async () => {
 
   const response = await api
     .put(`/api/blogs/${updatedBlog.id}`)
+    .set('Authorization', token)
     .send(updatedBlog)
 
   expect(response.body.likes).toEqual(updatedBlog.likes)

@@ -39,15 +39,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 var blog_1 = __importDefault(require("../models/blog"));
 var user_1 = __importDefault(require("../models/user"));
 var blogRouter = require('express').Router();
-blogRouter.get('/', function (_, response) { return __awaiter(void 0, void 0, void 0, function () {
+blogRouter.get('/', function (request, response) { return __awaiter(void 0, void 0, void 0, function () {
     var blogs;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, blog_1.default.find({}).populate('user', { username: 1, name: 1 })];
+            case 0:
+                if (!request.body.token)
+                    return [2 /*return*/, response.status(401).json({ error: 'token missing or invalid' })];
+                return [4 /*yield*/, blog_1.default.find({}).populate('user', { username: 1, name: 1 })];
             case 1:
                 blogs = _a.sent();
                 response.json(blogs);
@@ -59,7 +61,10 @@ blogRouter.get('/:id', function (request, response, next) { return __awaiter(voi
     var blog;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, blog_1.default.findById(request.params.id)];
+            case 0:
+                if (!request.body.token)
+                    return [2 /*return*/, response.status(401).json({ error: 'token missing or invalid' })];
+                return [4 /*yield*/, blog_1.default.findById(request.params.id)];
             case 1:
                 blog = _a.sent();
                 if (blog) {
@@ -73,22 +78,19 @@ blogRouter.get('/:id', function (request, response, next) { return __awaiter(voi
     });
 }); });
 blogRouter.post('/', function (request, response, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var blogObject, token, decodedToken, user, blog, savedBlog;
+    var body, user, blog, savedBlog;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                blogObject = request.body;
-                token = getTokenFrom(request);
-                decodedToken = jsonwebtoken_1.default.verify(token, process.env.SECRET);
-                if (typeof decodedToken == 'string' || !(decodedToken === null || decodedToken === void 0 ? void 0 : decodedToken.id))
+                body = request.body;
+                if (!body.token)
                     return [2 /*return*/, response.status(401).json({ error: 'token missing or invalid' })];
-                return [4 /*yield*/, user_1.default.findById(decodedToken.id)];
+                return [4 /*yield*/, user_1.default.findById(body.userId)];
             case 1:
                 user = _a.sent();
-                blogObject.user = user._id;
-                if (!blogObject.likes)
-                    blogObject.likes = 0;
-                blog = new blog_1.default(blogObject);
+                if (!body.likes)
+                    body.likes = 0;
+                blog = new blog_1.default(body);
                 return [4 /*yield*/, blog.save()];
             case 2:
                 savedBlog = _a.sent();
@@ -106,6 +108,8 @@ blogRouter.put('/:id', function (request, response, next) { return __awaiter(voi
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
+                if (!request.body.token)
+                    return [2 /*return*/, response.status(401).json({ error: 'token missing or invalid' })];
                 _a = request.body, title = _a.title, author = _a.author, url = _a.url, likes = _a.likes;
                 blog = {
                     title: title,
@@ -126,7 +130,10 @@ blogRouter.put('/:id', function (request, response, next) { return __awaiter(voi
 blogRouter.delete('/:id', function (request, response, next) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, blog_1.default.findByIdAndDelete(request.params.id)];
+            case 0:
+                if (!request.body.token)
+                    return [2 /*return*/, response.status(401).json({ error: 'token missing or invalid' })];
+                return [4 /*yield*/, blog_1.default.findByIdAndDelete(request.params.id)];
             case 1:
                 _a.sent();
                 response.status(204).end();
@@ -134,11 +141,4 @@ blogRouter.delete('/:id', function (request, response, next) { return __awaiter(
         }
     });
 }); });
-var getTokenFrom = function (request) {
-    var auth = request.get('authorization');
-    if (auth && auth.toLowerCase().startsWith('bearer ')) {
-        return auth.substring(7);
-    }
-    return null;
-};
 exports.default = blogRouter;

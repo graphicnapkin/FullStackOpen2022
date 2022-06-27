@@ -11,6 +11,8 @@ import {
   requestLogger,
   unknownEndpoint,
   errorHandler,
+  tokenExtractor,
+  userExtractor,
 } from './utils/middleware'
 import { info, logError } from './utils/logger'
 import cors from 'cors'
@@ -27,6 +29,8 @@ const main = async () => {
   app.use(express.static('build'))
   app.use(express.json())
   app.use(requestLogger)
+  app.use(userExtractor)
+  app.use(tokenExtractor)
 
   app.use('/api/blogs', blogRouter)
   app.use('/api/users', userRouter)

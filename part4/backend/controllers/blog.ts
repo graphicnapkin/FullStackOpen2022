@@ -4,12 +4,16 @@ import Blog from '../models/blog'
 import User from '../models/user'
 const blogRouter: Router = require('express').Router()
 
-blogRouter.get('/', async (_, response) => {
+blogRouter.get('/', async (request, response) => {
+  if (!request.body.token)
+    return response.status(401).json({ error: 'token missing or invalid' })
   const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
   response.json(blogs)
 })
 
 blogRouter.get('/:id', async (request, response, next) => {
+  if (!request.body.token)
+    return response.status(401).json({ error: 'token missing or invalid' })
   const blog = await Blog.findById(request.params.id)
   if (blog) {
     response.json(blog)
@@ -19,18 +23,14 @@ blogRouter.get('/:id', async (request, response, next) => {
 })
 
 blogRouter.post('/', async (request, response, next) => {
-  const blogObject = request.body
-  const token = getTokenFrom(request)
-  const decodedToken = jwt.verify(token as string, process.env.SECRET as string)
-  if (typeof decodedToken == 'string' || !decodedToken?.id)
+  const body = request.body
+  if (!body.token)
     return response.status(401).json({ error: 'token missing or invalid' })
+  const user = await User.findById(body.userId)
 
-  const user = await User.findById(decodedToken.id)
+  if (!body.likes) body.likes = 0
 
-  blogObject.user = user._id
-  if (!blogObject.likes) blogObject.likes = 0
-
-  const blog = new Blog(blogObject)
+  const blog = new Blog(body)
   const savedBlog = await blog.save()
 
   user.blogs = user.blogs.concat(savedBlog._id)
@@ -40,6 +40,8 @@ blogRouter.post('/', async (request, response, next) => {
 })
 
 blogRouter.put('/:id', async (request, response, next) => {
+  if (!request.body.token)
+    return response.status(401).json({ error: 'token missing or invalid' })
   const { title, author, url, likes } = request.body
   const blog = {
     title,
@@ -54,17 +56,11 @@ blogRouter.put('/:id', async (request, response, next) => {
 })
 
 blogRouter.delete('/:id', async (request, response, next) => {
+  if (!request.body.token)
+    return response.status(401).json({ error: 'token missing or invalid' })
   await Blog.findByIdAndDelete(request.params.id)
   response.status(204).end()
 })
-
-const getTokenFrom = (request: Request) => {
-  const auth = request.get('authorization')
-  if (auth && auth.toLowerCase().startsWith('bearer ')) {
-    return auth.substring(7)
-  }
-  return null
-}
 
 export interface BlogInterface {
   title: string
