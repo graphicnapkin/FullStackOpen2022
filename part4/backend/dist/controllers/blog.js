@@ -128,13 +128,22 @@ blogRouter.put('/:id', function (request, response, next) { return __awaiter(voi
     });
 }); });
 blogRouter.delete('/:id', function (request, response, next) { return __awaiter(void 0, void 0, void 0, function () {
+    var blog;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 if (!request.body.token)
                     return [2 /*return*/, response.status(401).json({ error: 'token missing or invalid' })];
-                return [4 /*yield*/, blog_1.default.findByIdAndDelete(request.params.id)];
+                return [4 /*yield*/, blog_1.default.findById(request.params.id)];
             case 1:
+                blog = _a.sent();
+                if (request.body.user !== blog.user._id.toString()) {
+                    return [2 /*return*/, response
+                            .status(401)
+                            .json({ error: 'user not authorized to delete this blog' })];
+                }
+                return [4 /*yield*/, blog_1.default.findByIdAndDelete(request.params.id)];
+            case 2:
                 _a.sent();
                 response.status(204).end();
                 return [2 /*return*/];

@@ -9,16 +9,18 @@ let token = ''
 const { initialBlogs, nonExistingId, blogsInDb } = require('./test_helper')
 
 beforeEach(async () => {
-  await Blog.deleteMany({})
-  const blogPromises = initialBlogs
-    .map((blog) => new Blog(blog))
-    .map((blog) => blog.save())
-  await Promise.all(blogPromises)
-
   const user = await api
     .post('/api/login')
     .send({ username: 'root', password: 'sekret' })
   token = `Bearer ${user.body.token}`
+
+  const blogUser = await User.findOne({ username: 'root' })
+
+  await Blog.deleteMany({})
+  const blogPromises = initialBlogs
+    .map((blog) => new Blog({ ...blog, user: blogUser._id }))
+    .map((blog) => blog.save())
+  await Promise.all(blogPromises)
 })
 
 test('notes are returned as json', async () => {
