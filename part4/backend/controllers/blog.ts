@@ -26,7 +26,7 @@ blogRouter.post('/', async (request, response, next) => {
   const body = request.body
   if (!body.token)
     return response.status(401).json({ error: 'token missing or invalid' })
-  const user = await User.findById(body.userId)
+  const user = await User.findById(body.user)
 
   if (!body.likes) body.likes = 0
 

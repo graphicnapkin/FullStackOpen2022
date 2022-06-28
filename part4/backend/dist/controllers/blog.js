@@ -85,7 +85,7 @@ blogRouter.post('/', function (request, response, next) { return __awaiter(void 
                 body = request.body;
                 if (!body.token)
                     return [2 /*return*/, response.status(401).json({ error: 'token missing or invalid' })];
-                return [4 /*yield*/, user_1.default.findById(body.userId)];
+                return [4 /*yield*/, user_1.default.findById(body.user)];
             case 1:
                 user = _a.sent();
                 if (!body.likes)

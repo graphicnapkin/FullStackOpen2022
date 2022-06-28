@@ -65,7 +65,6 @@ export const userExtractor = async (
       request.body.user = decodedToken.id.toString()
     }
   }
-
   next()
 }
 
