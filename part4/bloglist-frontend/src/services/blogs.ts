@@ -1,31 +1,21 @@
 import axios from "axios";
 const baseUrl = "/api/blogs";
+let options = {};
+
+const setToken = (token: string) =>
+  (options = { headers: { Authorization: "Bearer " + token } });
 
 const login = async (username: string, password: string) => {
   const response = await axios.post("/api/login", { username, password });
-  return response.data;
+  return response.data as User;
 };
 
-const getAllBlogs = async (token: string) => {
-  const request = await axios.get(baseUrl, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  return request.data as { id: string; title: string; author: string }[];
+const getAllBlogs = async () => {
+  const request = await axios.get(baseUrl, options);
+  return request.data as BlogResponse[];
 };
 
-const addBlog = async ({
-  token,
-  author,
-  title,
-  url,
-}: {
-  token: string;
-  author: string;
-  title: string;
-  url: string;
-}) => {
+const addBlog = async ({ author, title, url }: Blog) => {
   const request = await axios.post(
     baseUrl,
     {
@@ -33,21 +23,47 @@ const addBlog = async ({
       author,
       url,
     },
-    { headers: { Authorization: `Bearer ${token}` } }
+    options
   );
-  return request.data as {
-    id: string;
-    user: string;
-    likes: number;
-    author: string;
-    title: string;
-  };
+  return request.data as BlogResponse;
+};
+
+const editBlog = async ({ author, title, url }: Blog) => {
+  const request = await axios.put(
+    baseUrl,
+    {
+      title,
+      author,
+      url,
+    },
+    options
+  );
+  return request.data as BlogResponse;
 };
 
 const api = {
   addBlog,
+  editBlog,
   getAllBlogs,
   login,
+  setToken,
 };
+
+export interface User {
+  username: string;
+  name: string;
+  token: string;
+}
+
+export interface Blog {
+  author: string;
+  title: string;
+  url?: string;
+}
+
+export interface BlogResponse extends Blog {
+  id: string;
+  likes?: number;
+}
 
 export default api;

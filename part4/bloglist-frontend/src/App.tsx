@@ -1,183 +1,66 @@
 import { useState, useEffect } from "react";
-import Blog from "./components/Blog";
-import api from "./services/blogs";
+import Blogs from "./components/Blogs";
+import api, { User, BlogResponse } from "./services/blogs";
+
+//custom components
+import AddBlog from "./components/AddBlog";
+import LoginForm from "./components/LoginForm";
 
 const App = () => {
-  const [blogs, setBlogs] = useState<
-    { title: string; author: string; id: string }[]
-  >([]);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [user, setUser] = useState<{
-    username: string;
-    name: string;
-    token: string;
-  }>();
-  const [errorMessage, setErrorMessage] = useState("");
+  const [blogs, setBlogs] = useState<BlogResponse[]>([]);
+  const [user, setUser] = useState<User | undefined>();
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     user &&
       (async () => {
-        const blogs = await api.getAllBlogs(user.token);
+        api.setToken(user.token);
+        const blogs = await api.getAllBlogs();
         setBlogs(blogs);
       })();
   }, [user]);
 
-  const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    try {
-      const response = await api.login(username, password);
-      setUser(response);
-      setUsername("");
-      setPassword("");
-    } catch (err) {
-      setErrorMessage("Wrong credentials");
-      setTimeout(() => {
-        setErrorMessage("");
-      }, 5000);
+  useEffect(() => {
+    const savedData = window.localStorage.getItem("user");
+    if (savedData) {
+      const user = JSON.parse(savedData);
+      setUser(user);
     }
+  }, []);
+
+  const handleLogout = () => {
+    window.localStorage.clear();
+    setUser(undefined);
+    setBlogs([]);
+  };
+
+  const setNotification = (input: string) => {
+    setMessage(input);
+    setTimeout(() => {
+      setMessage("");
+      console.log("should be gone");
+    }, 5000);
   };
 
   return (
     <>
-      {errorMessage && <div>{errorMessage}</div>}
-      {!user && (
-        <LoginForm
-          errorMessage={errorMessage}
-          username={username}
-          password={password}
-          setUsername={setUsername}
-          setPassword={setPassword}
-          handleLogin={handleLogin}
-        />
-      )}
+      {message && <div>{message}</div>}
+      {!user && <LoginForm setMessage={setNotification} setUser={setUser} />}
       {user && (
         <>
-          <p>{user.name} is logged in</p>
+          <p>
+            {user.name} is logged in{" "}
+            <button onClick={handleLogout}>logout</button>
+          </p>
           <AddBlog
-            token={user.token}
-            setError={setErrorMessage}
+            setMessage={setNotification}
             blogs={blogs}
             setBlogs={setBlogs}
           />
         </>
       )}
-      <Blogs blogs={blogs} />
+      <Blogs blogs={blogs} user={user} />
     </>
-  );
-};
-const AddBlog = ({
-  setError,
-  setBlogs,
-  token,
-  blogs,
-}: {
-  setError: React.Dispatch<React.SetStateAction<string>>;
-  token: string;
-  setBlogs: React.Dispatch<
-    React.SetStateAction<{ title: string; author: string; id: string }[]>
-  >;
-  blogs: { title: string; author: string; id: string }[];
-}) => {
-  const [author, setAuthor] = useState("");
-  const [title, setTitle] = useState("");
-  const [url, setUrl] = useState("");
-
-  const addBlog = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    try {
-      const response = await api.addBlog({ author, title, url, token });
-      setBlogs([...blogs, { title, author, id: response.id }]);
-    } catch (err) {
-      setError("Invalid Blog");
-    }
-  };
-
-  return (
-    <form onSubmit={addBlog}>
-      author:{" "}
-      <input
-        value={author}
-        onChange={(e) => {
-          setAuthor(e.target.value);
-        }}
-      />
-      <br />
-      title:{" "}
-      <input
-        value={title}
-        onChange={(e) => {
-          setTitle(e.target.value);
-        }}
-      />
-      <br />
-      url:{" "}
-      <input
-        value={url}
-        onChange={(e) => {
-          setUrl(e.target.value);
-        }}
-      />
-      <br />
-      <button type="submit">save</button>
-    </form>
-  );
-};
-
-const LoginForm = ({
-  username,
-  setUsername,
-  password,
-  setPassword,
-  handleLogin,
-}: {
-  errorMessage: string;
-  username: string;
-  setUsername: React.Dispatch<React.SetStateAction<string>>;
-  password: string;
-  setPassword: React.Dispatch<React.SetStateAction<string>>;
-  handleLogin: (event: React.FormEvent<HTMLFormElement>) => Promise<void>;
-}) => {
-  return (
-    <>
-      <form onSubmit={handleLogin}>
-        <div>
-          username
-          <input
-            type="text"
-            value={username}
-            name="Username"
-            onChange={({ target }) => setUsername(target.value)}
-          />
-        </div>
-        <div>
-          password
-          <input
-            type="password"
-            value={password}
-            name="Password"
-            onChange={({ target }) => setPassword(target.value)}
-          />
-        </div>
-        <button type="submit">login</button>
-      </form>
-    </>
-  );
-};
-
-const Blogs = ({
-  blogs,
-}: {
-  blogs: { title: string; author: string; id: string }[];
-}) => {
-  return (
-    <div>
-      <h2>blogs</h2>
-      {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
-      ))}
-    </div>
   );
 };
 
