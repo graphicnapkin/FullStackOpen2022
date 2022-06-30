@@ -1,14 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, MutableRefObject } from "react";
 import api, { BlogResponse } from "../services/blogs";
 
 const AddBlog = ({
   setMessage,
   setBlogs,
   blogs,
+  toggleForm,
 }: {
   setMessage: (input: string) => void;
   setBlogs: React.Dispatch<React.SetStateAction<BlogResponse[]>>;
   blogs: BlogResponse[];
+  toggleForm: () => void;
 }) => {
   const [author, setAuthor] = useState("");
   const [title, setTitle] = useState("");
@@ -16,11 +18,17 @@ const AddBlog = ({
 
   const addBlog = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
     try {
       const response = await api.addBlog({ author, title, url });
-      setBlogs([...blogs, { title, author, id: response.id }]);
+      setBlogs([...blogs, { title, author, id: response.id, likes: 0 }]);
       setMessage(`${title} by ${author} was sucessfully added...`);
+      toggleForm();
+      setAuthor("");
+      setTitle("");
+      setUrl("");
     } catch (err) {
+      console.log(err);
       setMessage("Invalid Blog");
     }
   };

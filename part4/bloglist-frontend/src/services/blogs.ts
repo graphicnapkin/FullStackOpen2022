@@ -28,13 +28,14 @@ const addBlog = async ({ author, title, url }: Blog) => {
   return request.data as BlogResponse;
 };
 
-const editBlog = async ({ author, title, url }: Blog) => {
+const editBlog = async ({ author, title, url, likes, id }: BlogResponse) => {
   const request = await axios.put(
-    baseUrl,
+    `${baseUrl}/${id}`,
     {
       title,
       author,
       url,
+      likes,
     },
     options
   );
@@ -63,7 +64,7 @@ export interface Blog {
 
 export interface BlogResponse extends Blog {
   id: string;
-  likes?: number;
+  likes: number;
 }
 
 export default api;

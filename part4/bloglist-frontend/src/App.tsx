@@ -1,16 +1,22 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Blogs from "./components/Blogs";
 import api, { User, BlogResponse } from "./services/blogs";
 
 //custom components
 import AddBlog from "./components/AddBlog";
 import LoginForm from "./components/LoginForm";
+import Togglable from "./components/Togglable";
 
 const App = () => {
   const [blogs, setBlogs] = useState<BlogResponse[]>([]);
   const [user, setUser] = useState<User | undefined>();
   const [message, setMessage] = useState("");
 
+  const blogFormRef = useRef();
+  const toggleBlogForm = blogFormRef
+    ? //@ts-ignore
+      () => blogFormRef?.current?.toggleVisibility()
+    : () => {};
   useEffect(() => {
     user &&
       (async () => {
@@ -52,14 +58,17 @@ const App = () => {
             {user.name} is logged in{" "}
             <button onClick={handleLogout}>logout</button>
           </p>
-          <AddBlog
-            setMessage={setNotification}
-            blogs={blogs}
-            setBlogs={setBlogs}
-          />
+          <Togglable labels={["new blog", "canel"]} ref={blogFormRef}>
+            <AddBlog
+              setMessage={setNotification}
+              blogs={blogs}
+              setBlogs={setBlogs}
+              toggleForm={toggleBlogForm}
+            />
+          </Togglable>
         </>
       )}
-      <Blogs blogs={blogs} user={user} />
+      <Blogs blogs={blogs} setBlogs={setBlogs} />
     </>
   );
 };
