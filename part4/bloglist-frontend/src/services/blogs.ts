@@ -42,26 +42,39 @@ const editBlog = async ({ author, title, url, likes, id }: BlogResponse) => {
   return request.data as BlogResponse;
 };
 
+const deleteBlog = async (id: string) => {
+  const request = await axios.delete(`${baseUrl}/${id}`, options);
+  return request.data;
+};
+
 const api = {
   addBlog,
   editBlog,
   getAllBlogs,
   login,
   setToken,
+  deleteBlog,
 };
 
 export interface User {
   username: string;
   name: string;
   token: string;
+  id: string;
 }
 
 export interface Blog {
   author: string;
   title: string;
   url?: string;
+  user: BlogUser;
 }
 
+export interface BlogUser {
+  username: string;
+  name: string;
+  id: string;
+}
 export interface BlogResponse extends Blog {
   id: string;
   likes: number;

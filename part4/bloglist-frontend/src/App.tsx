@@ -60,6 +60,7 @@ const App = () => {
           </p>
           <Togglable labels={["new blog", "canel"]} ref={blogFormRef}>
             <AddBlog
+              user={user}
               setMessage={setNotification}
               blogs={blogs}
               setBlogs={setBlogs}
@@ -68,7 +69,7 @@ const App = () => {
           </Togglable>
         </>
       )}
-      <Blogs blogs={blogs} setBlogs={setBlogs} />
+      <Blogs blogs={blogs} user={user} setBlogs={setBlogs} />
     </>
   );
 };
