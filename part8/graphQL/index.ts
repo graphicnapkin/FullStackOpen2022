@@ -1,4 +1,6 @@
 import { ApolloServer, gql } from 'apollo-server'
+import { v1 } from 'uuid'
+const uuid = v1
 
 type ResolverFn = (parent: any, args: any) => any
 interface ResolverMap {
@@ -7,6 +9,7 @@ interface ResolverMap {
 interface Resolvers {
   Query: ResolverMap
   Author: ResolverMap
+  Mutation: ResolverMap
 }
 
 let authors = [
@@ -103,10 +106,13 @@ const typeDefs = gql`
     bookCount: Int!
     findAuthor(name: String!): Author
     findBook(title: String!): Book
+    allAuthors: [Author]!
+    allBooks: [Book]!
   }
 
   type Author {
     books: [Book]
+    bookCount: Int!
     name: String!
     id: ID!
     born: Int
@@ -119,6 +125,11 @@ const typeDefs = gql`
     id: ID!
     genres: [String!]!
   }
+
+  type Mutation {
+    addAuthor(name: String!, born: Int): Author
+    addBook(title: String!, author: String!, genres: [String!]!): Book
+  }
 `
 
 const resolvers: Resolvers = {
@@ -127,9 +138,24 @@ const resolvers: Resolvers = {
     bookCount: () => books.length,
     findAuthor: (_, { name }) => authors.find((a) => a.name === name),
     findBook: (_, { title }) => books.find((b) => b.title === title),
+    allAuthors: () => authors,
+    allBooks: () => books,
   },
   Author: {
     books: (root) => books.filter((b) => b.author === root.name),
+    bookCount: (root) => books.filter((b) => b.author === root.name).length,
+  },
+  Mutation: {
+    addAuthor: (root, args) => {
+      const author = { ...args, id: uuid() }
+      authors = [...authors, author]
+      return author
+    },
+    addBook: (root, args) => {
+      const book = { ...args, id: uuid() }
+      books = [...books, book]
+      return book
+    },
   },
 }
 
