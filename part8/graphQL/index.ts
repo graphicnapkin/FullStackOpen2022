@@ -107,7 +107,7 @@ const typeDefs = gql`
     findAuthor(name: String!): Author
     findBook(title: String!): Book
     allAuthors: [Author]!
-    allBooks: [Book]!
+    allBooks(author: String, genre: String): [Book]!
   }
 
   type Author {
@@ -129,6 +129,7 @@ const typeDefs = gql`
   type Mutation {
     addAuthor(name: String!, born: Int): Author
     addBook(title: String!, author: String!, genres: [String!]!): Book
+    editAuthor(name: String!, setBornTo: Int!): Author
   }
 `
 
@@ -139,7 +140,17 @@ const resolvers: Resolvers = {
     findAuthor: (_, { name }) => authors.find((a) => a.name === name),
     findBook: (_, { title }) => books.find((b) => b.title === title),
     allAuthors: () => authors,
-    allBooks: () => books,
+    allBooks: (root, args) => {
+      let filteredBooks = [...books]
+      if (args.author)
+        filteredBooks = filteredBooks.filter((b) => b.author === args.author)
+      if (args.genre) {
+        filteredBooks = filteredBooks.filter((b) =>
+          b.genres.some((g) => g === args.genre)
+        )
+      }
+      return filteredBooks
+    },
   },
   Author: {
     books: (root) => books.filter((b) => b.author === root.name),
@@ -153,8 +164,21 @@ const resolvers: Resolvers = {
     },
     addBook: (root, args) => {
       const book = { ...args, id: uuid() }
+      if (!authors.find((a) => a.name === args.author)) {
+        authors = [...authors, { name: args.author, id: uuid() }]
+      }
       books = [...books, book]
       return book
+    },
+    editAuthor: (root, args) => {
+      let updatedAuthor = {} as typeof authors[0]
+      authors = authors.map((a) => {
+        if (a.name !== args.name) return a
+        updatedAuthor = { ...a, born: args.setBornTo }
+        return updatedAuthor
+      })
+      if (!updatedAuthor.name) return null
+      return updatedAuthor
     },
   },
 }
