@@ -1,4 +1,6 @@
 import { useState } from "react"
+import { NEW_BOOK } from "../services"
+import { useMutation } from "@apollo/client"
 
 const NewBook = ({ show }: { show: boolean }) => {
   const [title, setTitle] = useState("")
@@ -6,6 +8,8 @@ const NewBook = ({ show }: { show: boolean }) => {
   const [published, setPublished] = useState("")
   const [genre, setGenre] = useState("")
   const [genres, setGenres] = useState<string[]>([])
+
+  const [createBook] = useMutation(NEW_BOOK)
 
   if (!show) {
     return null
@@ -15,7 +19,15 @@ const NewBook = ({ show }: { show: boolean }) => {
     event.preventDefault()
 
     console.log("add book...")
+    const variables: { [key: string]: string | string[] } = {
+      title,
+      author,
+      genres,
+    }
+    if (published) variables.published = published
 
+    const response = await createBook({ variables })
+    console.log(response)
     setTitle("")
     setPublished("")
     setAuthor("")

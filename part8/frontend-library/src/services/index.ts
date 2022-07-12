@@ -25,6 +25,7 @@ export const ALL_AUTHORS = gql`
 export const FIND_AUTHOR = gql`
   query findAuthorByName($nameToSearch: String!) {
     findAuthor(name: $nameToSearch) {
+      name
       bookCount
       id
       born
@@ -34,6 +35,14 @@ export const FIND_AUTHOR = gql`
         id
         genres
       }
+    }
+  }
+`
+
+export const EDIT_AUTHOR = gql`
+  mutation editAuthor($name: String!, $born: Int!) {
+    editAuthor(name: $name, setBornTo: $born) {
+      id
     }
   }
 `
@@ -49,6 +58,14 @@ export const ALL_BOOKS = gql`
         id
         name
       }
+    }
+  }
+`
+
+export const NEW_BOOK = gql`
+  mutation newBook($title: String!, $author: String!, $genres: [String!]!) {
+    addBook(title: $title, author: $author, genres: $genres) {
+      id
     }
   }
 `

@@ -1,39 +1,37 @@
+import { ALL_BOOKS } from "../services/index"
+import Book, { BookType } from "./Book"
+import { useQuery } from "@apollo/client"
+
 const Books = ({ show }: { show: boolean }) => {
-  if (show) {
+  const result = useQuery(ALL_BOOKS, { pollInterval: 5000 })
+
+  if (!show) {
     return null
   }
 
-  const books = [] as Book[]
+  if (result.loading) {
+    return <div>loading...</div>
+  }
+
+  const books = result?.data?.allBooks as BookType[]
 
   return (
     <div>
       <h2>books</h2>
-
       <table>
         <tbody>
-          <tr>
-            <th></th>
+          <tr style={{ textAlign: "left" }}>
+            <th>title</th>
             <th>author</th>
             <th>published</th>
           </tr>
-          {books.map((a) => (
-            <tr key={a.title}>
-              <td>{a.title}</td>
-              <td>{a.author}</td>
-              <td>{a.published}</td>
-            </tr>
+          {books.map((b) => (
+            <Book book={b} key={b.id} />
           ))}
         </tbody>
       </table>
     </div>
   )
-}
-
-type Book = {
-  title: string
-  author: string
-  published?: number
-  genres: string[]
 }
 
 export default Books
