@@ -9,6 +9,7 @@ interface ResolverMap {
 interface Resolvers {
   Query: ResolverMap
   Author: ResolverMap
+  Book: ResolverMap
   Mutation: ResolverMap
 }
 
@@ -121,14 +122,19 @@ const typeDefs = gql`
   type Book {
     title: String!
     published: Int
-    author: String!
+    author: Author!
     id: ID!
     genres: [String!]!
   }
 
   type Mutation {
     addAuthor(name: String!, born: Int): Author
-    addBook(title: String!, author: String!, genres: [String!]!): Book
+    addBook(
+      title: String!
+      author: String!
+      genres: [String!]!
+      published: Int
+    ): Book
     editAuthor(name: String!, setBornTo: Int!): Author
   }
 `
@@ -155,6 +161,9 @@ const resolvers: Resolvers = {
   Author: {
     books: (root) => books.filter((b) => b.author === root.name),
     bookCount: (root) => books.filter((b) => b.author === root.name).length,
+  },
+  Book: {
+    author: (root) => authors.find((a) => a.name === root.author),
   },
   Mutation: {
     addAuthor: (root, args) => {
