@@ -1,15 +1,26 @@
 import { useState } from "react"
-import { NEW_BOOK } from "../services"
+import { ALL_BOOKS, NEW_BOOK } from "../services"
 import { useMutation } from "@apollo/client"
 
-const NewBook = ({ show }: { show: boolean }) => {
+const NewBook = ({
+  show,
+  setError,
+}: {
+  show: boolean
+  setError: React.Dispatch<React.SetStateAction<string>>
+}) => {
   const [title, setTitle] = useState("")
   const [author, setAuthor] = useState("")
   const [published, setPublished] = useState("")
   const [genre, setGenre] = useState("")
   const [genres, setGenres] = useState<string[]>([])
 
-  const [createBook] = useMutation(NEW_BOOK)
+  const [createBook] = useMutation(NEW_BOOK, {
+    refetchQueries: [{ query: ALL_BOOKS }],
+    onError: (error) => {
+      setError(error.graphQLErrors[0].message)
+    },
+  })
 
   if (!show) {
     return null
@@ -18,7 +29,6 @@ const NewBook = ({ show }: { show: boolean }) => {
   const submit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    console.log("add book...")
     const variables: { [key: string]: string | string[] } = {
       title,
       author,
@@ -26,8 +36,7 @@ const NewBook = ({ show }: { show: boolean }) => {
     }
     if (published) variables.published = published
 
-    const response = await createBook({ variables })
-    console.log(response)
+    await createBook({ variables })
     setTitle("")
     setPublished("")
     setAuthor("")

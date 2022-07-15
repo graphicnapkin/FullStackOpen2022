@@ -38,7 +38,6 @@ const Authors = ({ show }: { show: boolean }) => {
 
   if (nameToSearch && authorResult.data) {
     const author = authorResult.data.findAuthor as AuthorType
-    console.log(author)
     const authorsBooks = authorResult.data.findAuthor.books as BookType[]
     return (
       <>
@@ -80,6 +79,9 @@ const Authors = ({ show }: { show: boolean }) => {
       <form onSubmit={handleBornSubmit}>
         name
         <select value={name} onChange={(e) => setName(e.target.value)}>
+          <option key={"0"} value={"select"}>
+            select
+          </option>
           {authors.map((a) => (
             <option key={a.id} value={a.name}>
               {a.name}
