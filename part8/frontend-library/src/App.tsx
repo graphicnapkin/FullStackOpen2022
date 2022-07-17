@@ -3,6 +3,7 @@ import Authors from "./components/Authors"
 import Books from "./components/Books"
 import NewBook from "./components/NewBook"
 import LoginForm from "./components/LoginForm"
+import Recommended from "./components/Recommended"
 
 const App = () => {
   const [page, setPage] = useState("authors")
@@ -20,9 +21,13 @@ const App = () => {
         <button onClick={() => setPage("authors")}>authors</button>
         <button onClick={() => setPage("books")}>books</button>
         {loggedIn && <button onClick={() => setPage("add")}>add book</button>}
-        {!loggedIn && <button onClick={() => setPage("login")}>login</button>}
 
+        {!loggedIn && <button onClick={() => setPage("login")}>login</button>}
         {loggedIn && <button onClick={logOut}>logout</button>}
+
+        {loggedIn && (
+          <button onClick={() => setPage("recommended")}>recommended</button>
+        )}
       </div>
 
       {notify && <h3>{notify}</h3>}
@@ -37,6 +42,8 @@ const App = () => {
       <Books show={page === "books"} />
 
       <NewBook setError={setNotify} show={page === "add"} />
+
+      <Recommended show={page === "recommended"} />
     </div>
   )
 }

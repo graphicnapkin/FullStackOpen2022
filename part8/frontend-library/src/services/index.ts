@@ -20,11 +20,19 @@ export const client = new ApolloClient({
   link: authLink.concat(httpLink),
 })
 
-//login
+//Site User
 export const LOGIN = gql`
   mutation login($username: String!, $password: String!) {
     login(username: $username, password: $password) {
       value
+    }
+  }
+`
+
+export const USER = gql`
+  query {
+    me {
+      favouriteGenre
     }
   }
 `

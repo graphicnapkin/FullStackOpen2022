@@ -111,7 +111,7 @@ const resolvers: Resolvers = {
     },
     login: async (root, args) => {
       const user = await User.findOne({ username: args.username })
-
+      console.log(user)
       if (!user || args.password !== 'poop') {
         throw new UserInputError('wrong credentials')
       }
