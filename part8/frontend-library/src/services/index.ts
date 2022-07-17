@@ -79,8 +79,8 @@ export const EDIT_AUTHOR = gql`
 
 //Books
 export const ALL_BOOKS = gql`
-  query {
-    allBooks {
+  query allBooks($genre: String) {
+    allBooks(genre: $genre) {
       title
       id
       published
