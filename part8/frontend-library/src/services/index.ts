@@ -1,5 +1,13 @@
-import { ApolloClient, HttpLink, InMemoryCache, gql } from "@apollo/client"
+import {
+  ApolloClient,
+  HttpLink,
+  InMemoryCache,
+  split,
+  gql,
+} from "@apollo/client"
 import { setContext } from "@apollo/client/link/context"
+import { getMainDefinition } from "@apollo/client/utilities"
+import { WebSocketLink } from "@apollo/client/link/ws"
 
 const authLink = setContext((_, { headers }) => {
   const token = localStorage.getItem("library-user-token")
@@ -15,9 +23,28 @@ const httpLink = new HttpLink({
   uri: "http://localhost:4000",
 })
 
+const wsLink = new WebSocketLink({
+  uri: `ws://localhost:4000/graphql`,
+  options: {
+    reconnect: true,
+  },
+})
+
+const splitLink = split(
+  ({ query }) => {
+    const definition = getMainDefinition(query)
+    return (
+      definition.kind === "OperationDefinition" &&
+      definition.operation === "subscription"
+    )
+  },
+  wsLink,
+  authLink.concat(httpLink)
+)
+
 export const client = new ApolloClient({
   cache: new InMemoryCache(),
-  link: authLink.concat(httpLink),
+  link: splitLink,
 })
 
 //Site User
@@ -93,9 +120,9 @@ export const ALL_BOOKS = gql`
   }
 `
 
-export const NEW_BOOK = gql`
-  mutation newBook($title: String!, $author: String!, $genres: [String!]!) {
-    addBook(title: $title, author: $author, genres: $genres) {
+export const BOOK_ADDED = gql`
+  subscription {
+    bookAdded(title: $title, author: $author, genres: $genres) {
       id
     }
   }
