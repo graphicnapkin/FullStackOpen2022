@@ -1,0 +1,13 @@
+type ActualHours = [number, number, number, number, number]
+
+interface Output {
+    peroidLength: number
+    trainingDays: number
+    sucess: boolean
+    rating: number
+    ratingDescription: string
+    target: number
+    average: number
+}
+
+const calculateExercises = (target: number, actualHours: ActualHours) => {}
