@@ -1,7 +1,9 @@
 import express from 'express'
 const app = express()
+app.use(express.json())
 
 import { calculateBmi } from './bmiCalculator'
+import { calculateExercises } from './exerciseCalculator'
 
 app.get('/hello', (_req, res) => {
     res.send('Hello Full Stack!')
@@ -18,6 +20,11 @@ app.get('/bmi', (req, res) => {
         weight,
         bmi: calculateBmi(Number(height), Number(weight)),
     })
+})
+
+app.post('/exercises', (req, res) => {
+    const { daily_exercises, target } = req.body
+    res.send(calculateExercises(target, daily_exercises))
 })
 
 const PORT = 3003

@@ -8,7 +8,10 @@ interface Output {
     average: number
 }
 
-const calculateExercises = (target: number, actualHours: number[]): Output => {
+export const calculateExercises = (
+    target: number,
+    actualHours: number[]
+): Output => {
     const averageHours =
         actualHours.reduce((a, b) => a + b) / actualHours.length
     let rating = 0
@@ -36,7 +39,7 @@ const calculateExercises = (target: number, actualHours: number[]): Output => {
     }
 }
 
-const parseTheArguments = (
+export const parseTheArguments = (
     args: Array<string>
 ): { target: number; actualHours: number[] } => {
     if (args.length < 4) throw new Error('Not enough arguments')
