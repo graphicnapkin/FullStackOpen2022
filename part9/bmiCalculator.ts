@@ -1,11 +1,10 @@
-const calculateBmi = (height: number, weight: number) => {
+export const calculateBmi = (height: number, weight: number) => {
     const bmi = (weight / (height * height * 0.01)) * 100
     let output = ''
     if (bmi < 18.5) output = 'Underweight'
     else if (bmi < 25) output = 'Healthy Weight'
     else output = 'Overweight'
-    console.log(bmi)
-    console.log(output)
+    return output
 }
 
 const parseArguments = (
